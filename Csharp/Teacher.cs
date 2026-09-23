@@ -38,9 +38,7 @@ class Teacher
 
             return 0.0;
         }
-
-        // Остался XorAandB
-
+        
         bool askedDependA = WasAskedYesterday(DependA, yesterdayAsked);
         bool askedDependB = WasAskedYesterday(DependB, yesterdayAsked);
 
@@ -57,12 +55,9 @@ class Teacher
         return 0.0;
     }
 
-    private bool WasAskedYesterday(
-        Subject subject,
-        bool[] yesterdayAsked)
+    private bool WasAskedYesterday(Subject subject, bool[] yesterdayAsked)
     {
         int index = (int)subject;
-
         return yesterdayAsked[index];
     }
     public bool WillAsk(bool[] yesterdayAsked, Random rand)

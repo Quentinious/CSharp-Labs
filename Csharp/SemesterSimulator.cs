@@ -6,10 +6,7 @@ class SemesterSimulator
     private StudentStrategy strategy;
     private Random rand;
 
-    public SemesterSimulator(
-        Teacher[] teachers,
-        StudentStrategy strategy,
-        Random rand)
+    public SemesterSimulator(Teacher[] teachers, StudentStrategy strategy, Random rand)
     {
         this.teachers = teachers;
         this.strategy = strategy;
@@ -19,9 +16,7 @@ class SemesterSimulator
     public int Run()
     {
         bool[] yesterdayAsked = new bool[teachers.Length];
-
         int pleasure = 0;
-
         for (int day = 0; day < 100; day++)
         {
             bool[] todayAsked = new bool[teachers.Length];
@@ -31,7 +26,6 @@ class SemesterSimulator
                 Teacher teacher = teachers[i];
                 bool skip = strategy.ShouldSkip(teacher, yesterdayAsked);
                 bool asked = teacher.WillAsk(yesterdayAsked, rand);
-
                 todayAsked[i] = asked;
                 if (skip)
                 {

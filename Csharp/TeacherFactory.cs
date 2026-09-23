@@ -11,22 +11,14 @@ static class TeacherFactory
         for (int i = 0; i < subjects.Length; i++)
         {
             TeacherRule rule = GetRandomRule(rand);
-
             Subject dependencyA = GetRandomSubject(rand, subjects);
+            Subject dependencyB = GetRandomDifferentSubject(rand, subjects, dependencyA);
 
-            Subject dependencyB =
-                GetRandomDifferentSubject(rand, subjects, dependencyA);
-
-            teachers[i] = new Teacher(
-                subjects[i],
-                rule,
-                dependencyA,
-                dependencyB
-            );
+            teachers[i] = new Teacher(subjects[i], rule, dependencyA, dependencyB);
         }
-
         return teachers;
     } 
+    
     private static Subject GetRandomDifferentSubject(Random rand, Subject[] subjects, Subject dependencyA)
     {
         Subject dependencyB = subjects[rand.Next(subjects.Length)];

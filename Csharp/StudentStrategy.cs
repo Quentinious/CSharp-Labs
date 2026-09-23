@@ -2,12 +2,9 @@
 
 class StudentStrategy
 {
-    public bool ShouldSkip(
-        Teacher teacher,
-        bool[] yesterdayAsked)
+    public bool ShouldSkip(Teacher teacher, bool[] yesterdayAsked)
     {
-        double probability =
-            teacher.GetAskProbability(yesterdayAsked);
+        double probability = teacher.GetAskProbability(yesterdayAsked);
 
         if (probability == 0.0)
         {
