@@ -1,16 +1,19 @@
 ﻿namespace Csharp;
 
-class StudentStrategy
+public sealed class StudentStrategy : ISkipStrategy
 {
-    public bool ShouldSkip(Teacher teacher, bool[] yesterdayAsked)
-    {
-        double probability = teacher.GetAskProbability(yesterdayAsked);
+    public string Name => "Консервативная стратегия";
 
-        if (probability == 0.0)
+    public bool[] DecideDay(int day, IReadOnlyStudentHistory history)
+    {
+        var subjectCount = Enum.GetValues<Subject>().Length;
+        var attendance = new bool[subjectCount];
+
+        for (var i = 0; i < attendance.Length; i++)
         {
-            return true;
+            attendance[i] = true;
         }
 
-        return false;
+        return attendance;
     }
 }

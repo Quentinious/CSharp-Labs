@@ -22,15 +22,21 @@ class Teacher
         DependA = dependA;
         DependB = dependB;
     }
-    public double GetAskProbability(bool[] yesterdayAsked)
+    public double GetAskProbability(int day, StudentHistory history)
     {
         if (Rule == TeacherRule.Check50)
         {
             return 0.5;
         }
+
+        if (day == 0)
+        {
+            return 0.0;
+        }
+
         if (Rule == TeacherRule.DependA)
         {
-            bool askedA = WasAskedYesterday(DependA, yesterdayAsked);
+            var askedA = history.WasActuallyAsked(day - 1, DependA);
             if (askedA)
             {
                 return 1.0;
@@ -38,31 +44,15 @@ class Teacher
 
             return 0.0;
         }
-        
-        bool askedDependA = WasAskedYesterday(DependA, yesterdayAsked);
-        bool askedDependB = WasAskedYesterday(DependB, yesterdayAsked);
 
-        if (askedDependA && !askedDependB)
-        {
-            return 1.0;
-        }
-
-        if (!askedDependA && askedDependB)
-        {
-            return 1.0;
-        }
-
-        return 0.0;
+        var askedDependA = history.WasActuallyAsked(day - 1, DependA);
+        var askedDependB = history.WasActuallyAsked(day - 1, DependB);
+        return askedDependA != askedDependB ? 1.0 : 0.0;
     }
 
-    private bool WasAskedYesterday(Subject subject, bool[] yesterdayAsked)
+    public bool WillAsk(int day, StudentHistory history, Random rand)
     {
-        int index = (int)subject;
-        return yesterdayAsked[index];
-    }
-    public bool WillAsk(bool[] yesterdayAsked, Random rand)
-    {
-        double probability = GetAskProbability(yesterdayAsked);
+        var probability = GetAskProbability(day, history);
 
         if (probability == 0.0)
         {
@@ -73,6 +63,7 @@ class Teacher
         {
             return true;
         }
+
         return rand.Next(2) == 0;
     }
 }

@@ -4,24 +4,23 @@ static class TeacherFactory
 {
     public static Teacher[] CreateTeachers(Random rand)
     {
-        Subject[] subjects = Enum.GetValues<Subject>();
+        var subjects = Enum.GetValues<Subject>();
+        var teachers = new Teacher[subjects.Length];
 
-        Teacher[] teachers = new Teacher[subjects.Length];
-
-        for (int i = 0; i < subjects.Length; i++)
+        for (var i = 0; i < subjects.Length; i++)
         {
-            TeacherRule rule = GetRandomRule(rand);
-            Subject dependencyA = GetRandomSubject(rand, subjects);
-            Subject dependencyB = GetRandomDifferentSubject(rand, subjects, dependencyA);
+            var rule = GetRandomRule(rand);
+            var dependencyA = GetRandomSubject(rand, subjects);
+            var dependencyB = GetRandomDifferentSubject(rand, subjects, dependencyA);
 
             teachers[i] = new Teacher(subjects[i], rule, dependencyA, dependencyB);
         }
         return teachers;
-    } 
-    
+    }
+
     private static Subject GetRandomDifferentSubject(Random rand, Subject[] subjects, Subject dependencyA)
     {
-        Subject dependencyB = subjects[rand.Next(subjects.Length)];
+        var dependencyB = subjects[rand.Next(subjects.Length)];
 
         while (dependencyB == dependencyA)
         {
@@ -32,13 +31,13 @@ static class TeacherFactory
 
     private static Subject GetRandomSubject(Random rand, Subject[] subjects)
     {
-        int index =  rand.Next(subjects.Length);
+        var index = rand.Next(subjects.Length);
         return subjects[index];
     }
 
     private static TeacherRule GetRandomRule(Random rand)
     {
-        int number = rand.Next(3);
+        var number = rand.Next(3);
         if (number == 0)
         {
             return TeacherRule.Check50;
@@ -47,6 +46,7 @@ static class TeacherFactory
         {
             return TeacherRule.DependA;
         }
+
         return TeacherRule.XorAandB;
     }
 }

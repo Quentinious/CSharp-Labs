@@ -1,43 +1,69 @@
 ﻿namespace Csharp;
 
-class SemesterSimulator
+internal sealed class SemesterSimulator
 {
-    private Teacher[] teachers;
-    private StudentStrategy strategy;
-    private Random rand;
+    public const int SemesterDays = 100;
 
-    public SemesterSimulator(Teacher[] teachers, StudentStrategy strategy, Random rand)
+    private readonly Teacher[] _teachers;
+    private readonly ISkipStrategy _strategy;
+    private readonly Random _rand;
+
+    public SemesterSimulator(Teacher[] teachers, ISkipStrategy strategy, Random rand)
     {
-        this.teachers = teachers;
-        this.strategy = strategy;
-        this.rand = rand;
+        _teachers = teachers;
+        _strategy = strategy;
+        _rand = rand;
     }
 
-    public int Run()
+    public SemesterResult Run()
     {
-        bool[] yesterdayAsked = new bool[teachers.Length];
-        int pleasure = 0;
-        for (int day = 0; day < 100; day++)
+        var history = new StudentHistory();
+        var pleasure = 0;
+
+        for (var day = 0; day < SemesterDays; day++)
         {
-            bool[] todayAsked = new bool[teachers.Length];
+            var attendance = _strategy.DecideDay(day, history);
+            ValidateAttendance(attendance);
+
+            var dayResult = new DayResult(day);
             pleasure++;
-            for (int i = 0; i < teachers.Length; i++)
+
+            foreach (var teacher in _teachers)
             {
-                Teacher teacher = teachers[i];
-                bool skip = strategy.ShouldSkip(teacher, yesterdayAsked);
-                bool asked = teacher.WillAsk(yesterdayAsked, rand);
-                todayAsked[i] = asked;
-                if (skip)
+                var attended = attendance[(int)teacher.Subject];
+                var asked = teacher.WillAsk(day, history, _rand);
+                var lessonResult = new LessonResult(attended, asked);
+                dayResult.Add(teacher.Subject, lessonResult);
+
+                if (!attended)
                 {
                     pleasure++;
                     if (asked)
                     {
-                        return 0;
+                        return new SemesterResult(0, true);
                     }
                 }
             }
-            yesterdayAsked = todayAsked;
+
+            history.Add(dayResult);
         }
-        return pleasure;
+
+        return new SemesterResult(pleasure, false);
+    }
+
+    private static void ValidateAttendance(bool[]? attendance)
+    {
+        var subjectCount = Enum.GetValues<Subject>().Length;
+
+        if (attendance is null)
+        {
+            throw new InvalidOperationException("Стратегия вернула null вместо решений на день.");
+        }
+
+        if (attendance.Length != subjectCount)
+        {
+            throw new InvalidOperationException(
+                $"Стратегия должна вернуть {subjectCount} решений, но вернула {attendance.Length}.");
+        }
     }
 }
