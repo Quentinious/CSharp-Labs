@@ -50,7 +50,7 @@ class Teacher
         return askedDependA != askedDependB ? 1.0 : 0.0;
     }
 
-    public bool WillAsk(int day, StudentHistory history, Random rand)
+    public bool WillAsk(int day, StudentHistory history, IRandomSource rand)
     {
         var probability = GetAskProbability(day, history);
 
@@ -58,8 +58,8 @@ class Teacher
         {
             return false;
         }
-
-        if (probability == 1.0)
+        
+        if (Math.Abs(probability - 1.0) < 0.001)
         {
             return true;
         }

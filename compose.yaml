@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:17
+    environment:
+      POSTGRES_USER: lab4
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in your environment}
+      POSTGRES_DB: csharp_labs
+    ports:
+      - "127.0.0.1:55432:5432"
+    volumes:
+      - lab4_postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U lab4 -d csharp_labs"]
+      interval: 2s
+      timeout: 3s
+      retries: 20
+
+volumes:
+  lab4_postgres:

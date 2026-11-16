@@ -1,24 +1,31 @@
 ﻿namespace Csharp;
 
-static class TeacherFactory
+internal sealed class TeacherFactory : ITeacherFactory
 {
-    public static Teacher[] CreateTeachers(Random rand)
+    private readonly IRandomSource _rand;
+
+    public TeacherFactory(IRandomSource rand)
+    {
+        _rand = rand;
+    }
+
+    public Teacher[] CreateTeachers()
     {
         var subjects = Enum.GetValues<Subject>();
         var teachers = new Teacher[subjects.Length];
 
         for (var i = 0; i < subjects.Length; i++)
         {
-            var rule = GetRandomRule(rand);
-            var dependencyA = GetRandomSubject(rand, subjects);
-            var dependencyB = GetRandomDifferentSubject(rand, subjects, dependencyA);
+            var rule = GetRandomRule(_rand);
+            var dependencyA = GetRandomSubject(_rand, subjects);
+            var dependencyB = GetRandomDifferentSubject(_rand, subjects, dependencyA);
 
             teachers[i] = new Teacher(subjects[i], rule, dependencyA, dependencyB);
         }
         return teachers;
     }
 
-    private static Subject GetRandomDifferentSubject(Random rand, Subject[] subjects, Subject dependencyA)
+    private static Subject GetRandomDifferentSubject(IRandomSource rand, Subject[] subjects, Subject dependencyA)
     {
         var dependencyB = subjects[rand.Next(subjects.Length)];
 
@@ -29,13 +36,13 @@ static class TeacherFactory
         return dependencyB;
     }
 
-    private static Subject GetRandomSubject(Random rand, Subject[] subjects)
+    private static Subject GetRandomSubject(IRandomSource rand, Subject[] subjects)
     {
         var index = rand.Next(subjects.Length);
         return subjects[index];
     }
 
-    private static TeacherRule GetRandomRule(Random rand)
+    private static TeacherRule GetRandomRule(IRandomSource rand)
     {
         var number = rand.Next(3);
         if (number == 0)

@@ -1,11 +1,12 @@
 ﻿namespace Csharp;
 
-internal sealed class DayResult
+public class DayResult
 {
     private readonly Dictionary<Subject, LessonResult> _lessons = new();
 
     public int Day { get; }
     public int LessonCount => _lessons.Count;
+    public IReadOnlyDictionary<Subject, LessonResult> Lessons => _lessons;
 
     public DayResult(int day)
     {

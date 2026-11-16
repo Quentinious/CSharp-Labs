@@ -1,6 +1,6 @@
 ﻿namespace Csharp;
 
-internal sealed class LessonResult
+public class LessonResult
 {
     public bool Attended { get; }
     public bool WasActuallyAsked { get; }
