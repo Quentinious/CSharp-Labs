@@ -1,43 +1,38 @@
-﻿namespace Csharp;
+namespace Csharp;
 
-class SemesterSimulator
+internal sealed class SemesterSimulator
 {
-    private Teacher[] teachers;
-    private StudentStrategy strategy;
-    private Random rand;
+    public const int SemesterDays = 100;
 
-    public SemesterSimulator(Teacher[] teachers, StudentStrategy strategy, Random rand)
+    private readonly DaySimulationEngine _engine;
+    private SemesterResult? _result;
+
+    public SemesterSimulator(Teacher[] teachers, ISkipStrategy strategy, IRandomSource rand)
     {
-        this.teachers = teachers;
-        this.strategy = strategy;
-        this.rand = rand;
+        _engine = new DaySimulationEngine(teachers, strategy, rand);
     }
 
-    public int Run()
+    public SemesterResult Run()
     {
-        bool[] yesterdayAsked = new bool[teachers.Length];
-        int pleasure = 0;
-        for (int day = 0; day < 100; day++)
+        if (_result is not null)
         {
-            bool[] todayAsked = new bool[teachers.Length];
-            pleasure++;
-            for (int i = 0; i < teachers.Length; i++)
-            {
-                Teacher teacher = teachers[i];
-                bool skip = strategy.ShouldSkip(teacher, yesterdayAsked);
-                bool asked = teacher.WillAsk(yesterdayAsked, rand);
-                todayAsked[i] = asked;
-                if (skip)
-                {
-                    pleasure++;
-                    if (asked)
-                    {
-                        return 0;
-                    }
-                }
-            }
-            yesterdayAsked = todayAsked;
+            return _result;
         }
-        return pleasure;
+
+        var pleasure = 0;
+        for (var day = 0; day < SemesterDays; day++)
+        {
+            var result = _engine.SimulateDay();
+            if (result.Expelled)
+            {
+                _result = new SemesterResult(0, true);
+                return _result;
+            }
+
+            pleasure = result.TotalPleasure;
+        }
+
+        _result = new SemesterResult(pleasure, false);
+        return _result;
     }
 }
